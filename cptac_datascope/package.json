@@ -1,0 +1,14 @@
+{
+  "name": "cptac_datascope",
+  "version": "1.0.0",
+  "description": "CPTAC datascope tool",
+  "main": "datascope_tool.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "birm",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "xlsx": "^0.15.6"
+  }
+}
