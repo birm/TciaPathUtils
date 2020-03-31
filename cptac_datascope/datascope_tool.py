@@ -1,6 +1,25 @@
+import xlrd
+
 # type from argument
 # filename of sheet from argument
 # open the file
+
+workbook = xlrd.open_workbook(filename, on_demand = True)
+# list sheets
+# user picks a sheet
+n = 0
+worksheet = workbook.sheet_by_index(n)
+first_row = [] # The row where we stock the name of the column
+for col in range(worksheet.ncols):
+    first_row.append( worksheet.cell_value(0,col) )
+# tronsform the workbook to a list of dictionnary
+data =[]
+for row in range(1, worksheet.nrows):
+    elm = {}
+    for col in range(worksheet.ncols):
+        elm[first_row[col]]=worksheet.cell_value(row,col)
+    data.append(elm)
+print data
 
 # path case (default)
 # list of sheets
