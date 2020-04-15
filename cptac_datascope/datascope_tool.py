@@ -1,14 +1,28 @@
 import xlrd
+import argparse
 
-# type from argument
-# filename of sheet from argument
-# open the file
+# arguments
+parser = argparse.ArgumentParser(description='CPTAC Datascope Automation')
+parser.add_argument('-f', dest='filename', help='filepath for Qualified Sheet')
+parser.add_argument('-s', dest='sheet', help='Sheet within file')
+args = parser.parse_args()
 
-workbook = xlrd.open_workbook(filename, on_demand = True)
-# list sheets
-# user picks a sheet
-n = 0
-worksheet = workbook.sheet_by_index(n)
+# get the file
+try:
+    workbook = xlrd.open_workbook(args.filename, on_demand = True)
+except FileNotFoundError as e:
+    print(e)
+    exit(1)
+
+# get the sheet
+try:
+    worksheet = workbook.sheet_by_name(args.sheet)
+except xlrd.biffh.XLRDError as e:
+    print('Tried: ', args.sheet)
+    print('Sheet Names ', workbook.sheet_names())
+    exit(1)
+
+
 first_row = [] # The row where we stock the name of the column
 for col in range(worksheet.ncols):
     first_row.append( worksheet.cell_value(0,col) )
@@ -19,7 +33,7 @@ for row in range(1, worksheet.nrows):
     for col in range(worksheet.ncols):
         elm[first_row[col]]=worksheet.cell_value(row,col)
     data.append(elm)
-print data
+print(data)
 
 # path case (default)
 # list of sheets
