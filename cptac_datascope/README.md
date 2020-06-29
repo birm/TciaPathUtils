@@ -1,6 +1,11 @@
 (Work in progress)
 This tool hopes to greatly streamline the process of processing the CDR qualified data to update CPTAC datascope.
 
+## Importing Results
+The csv output of this tool can be loaded to mongo.
+For example, to replace ALL data (after a backup please), run:
+`mongoimport --type csv -d data -c data --headerline --drop output.csv`
+
 # Steps without this tool
 
 ## Get the CRD Qualified sheet.

@@ -1,12 +1,12 @@
 import xlrd
 import argparse
+import math
 
 # arguments
 parser = argparse.ArgumentParser(description='CPTAC Datascope Automation')
-parser.add_argument('-f', dest='filename', help='filepath for Qualified Sheet')
+parser.add_argument('-f', dest='filename', help='Filepath for Qualified Sheet')
 parser.add_argument('-s', dest='sheet', help='Sheet within file')
 parser.add_argument('-t', dest='type', default='p', choices=['path', 'links', 'p', 'l'], help='What operation to perform')
-parser.add_argument('-d', dest='dest', help='Where to put the output. If empty, STDOUT, else the mongo uri given.')
 args = parser.parse_args()
 
 # get the file
@@ -53,10 +53,6 @@ if (args.type == "p" or args.type == "path"):
             exit(1)
         # special variables
         x['Pathology'] = x["Slide_ID"]
-        x['Genomics'] = x["Case_ID"]
-        x['Proteomics'] = x["Case_ID"]
-        #TODO actually do radiology search
-        x['Radiology'] = x.get("Slide_ID", "")
         if x['Radiology']:
             x["HasRadiology"] = "yes"
         else:
@@ -70,6 +66,12 @@ if (args.type == "p" or args.type == "path"):
             x['Proteomics'] = x["Case_ID"]
         else:
             x['Proteomics'] = ""
+        # age needs to be ranges for bins, string
+        if 'Age' in x and x['Age'] and not (x['Age'] == ">=90"):
+            x['Age'] = int(x['Age'])
+            x['Age'] = str(10*(math.floor(x['Age']/10.0))) + "-" + str(10+(10*(math.floor(x['Age']/10.0))))
+        else:
+            x['Age'] = "Unknown"
         # numerics N/A or missing to -1
         numerics = ["Weight", "Percent_Tumor_Nuclei", "Percent_Total_Cellularity", "Percent_Necrosis", "Volume", "Percent_Blast" ]
         for n in numerics:
@@ -82,8 +84,7 @@ if (args.type == "p" or args.type == "path"):
     pass
 
 if (args.type == "l" or args.type == "links"):
-    # TODO
-    # fields: Genomics, Proteomics, GDC Link, PDC Link
+    print("NOT YET IMPLEMENTED")
     pass
 
 # data processing with translation and postfcn
@@ -99,6 +100,5 @@ for row in range(1, worksheet.nrows):
         elm[x]=worksheet.cell_value(row,col)
     data.append(postfcn(elm))
 
-# TODO
-# post processing
+# TODO file output
 print(data)
