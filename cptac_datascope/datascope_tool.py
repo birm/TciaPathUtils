@@ -5,7 +5,7 @@ import argparse
 parser = argparse.ArgumentParser(description='CPTAC Datascope Automation')
 parser.add_argument('-f', dest='filename', help='filepath for Qualified Sheet')
 parser.add_argument('-s', dest='sheet', help='Sheet within file')
-parser.add_argument('-t', dest='type', default='p', choices=['path', 'rad', 'clinical', 'links', 'p', 'r', 'c', 'l'], help='What operation to perform')
+parser.add_argument('-t', dest='type', default='p', choices=['path', 'links', 'p', 'l'], help='What operation to perform')
 parser.add_argument('-d', dest='dest', help='Where to put the output. If empty, STDOUT, else the mongo uri given.')
 args = parser.parse_args()
 
@@ -30,16 +30,20 @@ postfcn = lambda x: x
 if (args.type == "p" or args.type == "path"):
     def p_postfcn (x):
         # rename variables
-        x['Tumor'] = x['Tumor_Type']
-        del x['Tumor_Type']
-        x['Volume'] = x['Volume_(ml)']
-        del x['Volume_(ml)']
-        x['Weight'] = x['Weight_(mg)']
-        del x['Weight_(mg)']
+        if 'Has_Radiology' in x:
+            x['Radiology'] = x['Has_Radiology']
+            del x['Has_Radiology']
+        if 'Volume_(ml)' in x:
+            x['Volume'] = x['Volume_(ml)']
+            del x['Volume_(ml)']
+        if 'Weight_(mg)' in x:
+            x['Weight'] = x['Weight_(mg)']
+            del x['Weight_(mg)']
         # require variables
         try:
             assert(x['Case_ID'])
-            assert(x['Tumor_Site'])
+            assert(x['Tumor'])
+            assert(x['Specimen_Type'])
             assert(x['Specimen_ID'])
             assert(x['Slide_ID'])
             assert(x["Topographic_Site"])
@@ -54,9 +58,9 @@ if (args.type == "p" or args.type == "path"):
         #TODO actually do radiology search
         x['Radiology'] = x.get("Slide_ID", "")
         if x['Radiology']:
-            x["HasRadiology"] = "true"
+            x["HasRadiology"] = "yes"
         else:
-            x["HasRadiology"] = "false"
+            x["HasRadiology"] = "no"
         # transformations
         if x['Genomics'] == 'Available':
             x['Genomics'] = x["Case_ID"]
@@ -75,14 +79,6 @@ if (args.type == "p" or args.type == "path"):
                 x[n] = "-1"
         return x
     postfcn = p_postfcn
-    pass
-
-if (args.type == "r" or args.type == "rad"):
-    pass
-
-
-if (args.type == "c" or args.type == "clinical"):
-    # TODO
     pass
 
 if (args.type == "l" or args.type == "links"):
