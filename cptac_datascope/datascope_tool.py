@@ -1,6 +1,7 @@
 import xlrd
 import argparse
 import math
+import csv
 
 # arguments
 parser = argparse.ArgumentParser(description='CPTAC Datascope Automation')
@@ -102,3 +103,7 @@ for row in range(1, worksheet.nrows):
 
 # TODO file output
 print(data)
+with open("output.csv", "w") as f:
+    fc = csv.DictWriter(f, fieldnames=data[0].keys())
+    fc.writeheader()
+    fc.writerows(data)
