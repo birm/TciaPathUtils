@@ -17,8 +17,8 @@ for line in sys.stdin:
         prevHits = hits.get(l[6].split("?")[0], 0)
         sizes[l[6].split("?")[0]] = prevSize + int(l[9])
         hits[l[6].split("?")[0]] = prevHits + 1
-    except:
-      print("error on a line")
+  except:
+    print("error on a line")
 
 print("*Kong Log Report for last 30 days*")
 print("Total bytes sent to client per Endpoint:")
